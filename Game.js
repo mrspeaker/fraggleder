@@ -2,6 +2,10 @@ const THREE = require("three");
 const makeChunkGeom = require("./geom/makeChunkGeom");
 const World = require("./world/World");
 const Physics = require("./Physics");
+const OBJLoader = require("./vendor/OBJLoader");
+const MTLLoader = require("./vendor/MTLLoader");
+
+const tween = require("./TweenManager");
 
 class Game {
 
@@ -18,10 +22,13 @@ class Game {
     this.physics = new Physics();
 
     this.addGeom();
+    this.addSomeTrees();
+
     this.lightScene();
 
     this.update = this.update.bind(this);
     requestAnimationFrame(this.update);
+
   }
 
   init () {
@@ -56,6 +63,32 @@ class Game {
     scene.add(dirLight2);
   }
 
+  addSomeTrees () {
+    const mtlLoader = new MTLLoader();
+    const objLoader = new OBJLoader();
+    mtlLoader.setPath("res/");
+    objLoader.setPath("res/");
+
+    const load = (name, cb) => mtlLoader.load(name + ".mtl", materials => {
+      materials.preload();
+      objLoader.setMaterials(materials);
+      objLoader.load(name + ".obj", mesh => cb(mesh));
+    });
+
+    load("Tree1", mesh => {
+      mesh.position.set(-8, -2, -8);
+      mesh.scale.set(4, 4, 4);
+      this.scene.add(mesh);
+      tween.add(mesh.rotation, {y: Math.PI * 2}, 1000);
+
+      load("Tree4", mesh => {
+        mesh.position.set(28, 4, 28);
+        mesh.scale.set(3, 3, 3);
+        this.scene.add(mesh);
+      });
+    });
+  }
+
   addGeom () {
     for (let c in this.world.chunks) {
       this.addChunkGeom(c);
@@ -77,7 +110,6 @@ class Game {
       this.scene.remove(this.geom[ch]);
       this.geom[ch].geometry.dispose();
       this.geom[ch] = null;
-
       this.geom[ch] = makeChunkGeom(this.world.chunks[ch]);
       this.scene.add(this.geom[ch]);
       this.world.chunks[ch].isDirty = false;
@@ -103,6 +135,8 @@ class Game {
     camera.position.x = Math.cos(spd) * this.dist;
     camera.position.z = Math.sin(spd) * this.dist;
     camera.lookAt(new THREE.Vector3(8, 12, 8));
+
+    tween.update();
 
     requestAnimationFrame(this.update);
   }

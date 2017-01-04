@@ -17,18 +17,15 @@ class Physics {
       if (position[dir] < chunk[dir] * chunk.w) {
         position[dir] = chunk[dir] * chunk.w;
         e.speed *= -1;
-        //e.dir = Math.random() < 0.5 ? "x" : "z"
       }
 
       if (position[dir] > (chunk[dir] * chunk.w) + chunk.w - 1) {
         position[dir] = (chunk[dir] * chunk.w) + chunk.w - 1;
         e.speed *= -1;
-        //e.dir = Math.random() < 0.5 ? "x" : "z"
       }
 
       e.tx = Math.round(position.x - (chunk.x * (chunk.w))) % chunk.w;
       e.tz = Math.round(position.z - (chunk.z * (chunk.w))) % chunk.w;
-      //console.log(e.tx, e.tz, position.x, chunk.x)
 
       // Hit a block
       if (chunk.data[e.ty][e.tx][e.tz] === 1) {
@@ -53,8 +50,6 @@ class Physics {
         if (e.canFall && !chunk.data[e.ty - 1][e.tx][e.tz]) {
           e.ty -= 1;
           if (e.ty === 0) e.ty = h - 1;
-//        e.dir = Math.random() < 0.5 ? "x" : "z";
-          //e.speed *= Math.random() < 0.5 ? -1 : 1;
         }
       }
       if (chunk.data[e.ty][e.tx][e.tz] !== 0) {

@@ -2,6 +2,8 @@ const THREE = require("three");
 const geom = require("../geom/geom");
 const materials = require("../geom/materials");
 
+const tween = require("../TweenManager");
+
 class Blerb extends THREE.Object3D {
   constructor(x, y, z, cw, ch) {
     super();
@@ -92,18 +94,25 @@ class Blerb extends THREE.Object3D {
       }
       break;
     case "bashing":
+      if (isStateFirst) {
+        const initp = this.rotation.y;
+        tween.add(this.rotation, {y: initp + (Math.PI * 2)}, 350, o => tween.add(o, {y: initp}, 350));
+      }
       if (this.stateTime > 100) {
-        chunk.setBlock(this.tx, this.ty, this.tz, 0);
-        chunk.setBlock(this.tx, this.ty - 1, this.tz, 0);
-        chunk.setBlock(this.tx, this.ty + 1, this.tz, 0);
-        chunk.setBlock(this.tx + 1, this.ty, this.tz, 0);
-        chunk.setBlock(this.tx - 1, this.ty, this.tz, 0);
-        chunk.setBlock(this.tx, this.ty, this.tz + 1, 0);
-        chunk.setBlock(this.tx, this.ty, this.tz - 1, 0);
-        chunk.setBlock(this.tx + 1, this.ty, this.tz + 1, 0);
-        chunk.setBlock(this.tx - 1, this.ty, this.tz + 1, 0);
-        chunk.setBlock(this.tx + 1, this.ty, this.tz - 1, 0);
-        chunk.setBlock(this.tx - 1, this.ty, this.tz - 1, 0);
+        [
+          [ 0, 1, 0],
+          [ 0, 0, 0],
+          [ 1, 0, 0],
+          [ 0, 0, 1],
+          [-1, 0, 0],
+          [ 0, 0,-1],
+          [ 1, 0, 1],
+          [ 1, 0,-1],
+          [-1, 0, 1],
+          [-1, 0,-1],
+          [ 0,-1, 0],
+        ]
+        .forEach(([x, y, z]) => chunk.setBlock(this.tx + x, this.ty + y, this.tz + z, 0));
 
         this.setState("walking");
       }
