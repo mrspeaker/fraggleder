@@ -79,10 +79,10 @@ class Game {
       mesh.position.set(-8, -2, -8);
       mesh.scale.set(4, 4, 4);
       this.scene.add(mesh);
-      tween.add(mesh.rotation, {y: Math.PI * 2}, 1000);
+      tween.add(mesh.rotation, {y: Math.PI * 2}, 10000);
 
       load("Tree4", mesh => {
-        mesh.position.set(28, 4, 28);
+        mesh.position.set(28, 2, 24);
         mesh.scale.set(3, 3, 3);
         this.scene.add(mesh);
       });

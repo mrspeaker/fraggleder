@@ -16,7 +16,7 @@ class Blerb extends THREE.Object3D {
     this.lastTz = this.tz;
 
     const blerbGeom = geom.blerb;
-    this.h = blerbGeom.parameters.height;
+    this.h = blerbGeom.parameters.height - 0.4;
     this.w = blerbGeom.parameters.width;
     const b1 = new THREE.Mesh(blerbGeom, materials.blerbBody);
     b1.scale.set(1, 0.3, 1);
