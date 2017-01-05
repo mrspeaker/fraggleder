@@ -58,7 +58,7 @@ class Physics {
           e.ty += 1;
         }
       }
-      position.y = e.ty + (e.h / 2);
+      position.y = e.ty;// + (e.h / 2);
       if (!e.canFall) {
         position.y += Math.sin(Date.now() / 200) * 0.2;
       }

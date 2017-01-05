@@ -1,6 +1,8 @@
 const THREE = require("three");
 const geom = require("../geom/geom");
 const materials = require("../geom/materials");
+const OBJLoader = require("../vendor/OBJLoader");
+const MTLLoader = require("../vendor/MTLLoader");
 
 const tween = require("../TweenManager");
 
@@ -15,25 +17,42 @@ class Blerb extends THREE.Object3D {
     this.lastTy = this.ty;
     this.lastTz = this.tz;
 
+    const mtlLoader = new MTLLoader();
+    const objLoader = new OBJLoader();
+    mtlLoader.setPath("res/");
+    objLoader.setPath("res/");
+
+    const load = (name, cb) => mtlLoader.load(name + ".mtl", materials => {
+      materials.preload();
+      objLoader.setMaterials(materials);
+      objLoader.load(name + ".obj", mesh => cb(mesh));
+    });
+
+    load("chess", mesh => {
+      //mesh.position.set(-8, -2, -8);
+      //mesh.scale.set(4, 4, 4);
+      this.add(mesh);
+    });
+
     const blerbGeom = geom.blerb;
-    this.h = blerbGeom.parameters.height - 0.4;
-    this.w = blerbGeom.parameters.width;
-    const b1 = new THREE.Mesh(blerbGeom, materials.blerbBody);
-    b1.scale.set(1, 0.3, 1);
-    b1.position.y = 0.4;
-    this.add(b1);
+    this.h = 1.4;//blerbGeom.parameters.height - 0.4;
+    this.w = 0.7;//blerbGeom.parameters.width;
+    //const b1 = new THREE.Mesh(blerbGeom, materials.blerbBody);
+    //b1.scale.set(1, 0.3, 1);
+    //b1.position.y = 0.4;
+    //this.add(b1);
 
     // Some hair
-    const b2 = new THREE.Mesh(blerbGeom, materials.white);
-    this.add(b2);
-    b2.position.y += 0.6;
-    b2.scale.set(0.9, 0.1, 0.9);
+    //const b2 = new THREE.Mesh(blerbGeom, materials.white);
+    //this.add(b2);
+    //b2.position.y += 0.6;
+    //b2.scale.set(0.9, 0.1, 0.9);
 
     // A blerbBody
-    const b3 = new THREE.Mesh(blerbGeom, materials.blerbBody);
-    this.add(b3);
-    b3.position.y += 0.2;
-    b3.scale.set(0.7, 0.8, 0.7);
+    //const b3 = new THREE.Mesh(blerbGeom, materials.blerbBody);
+    //this.add(b3);
+    //b3.position.y += 0.2;
+    //b3.scale.set(0.7, 0.8, 0.7);
 
     this.canFall = true;
 
