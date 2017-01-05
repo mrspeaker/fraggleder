@@ -1,6 +1,4 @@
 const THREE = require("three");
-const geom = require("../geom/geom");
-const materials = require("../geom/materials");
 const OBJLoader = require("../vendor/OBJLoader");
 const MTLLoader = require("../vendor/MTLLoader");
 
@@ -9,6 +7,7 @@ const tween = require("../TweenManager");
 class Blerb extends THREE.Object3D {
   constructor(x, y, z, cw, ch) {
     super();
+
     // NOTE: tx/ty/tz relative to chunk, not world
     this.tx = (x % cw) | 0;
     this.ty = (y % ch) | 0;
@@ -25,34 +24,29 @@ class Blerb extends THREE.Object3D {
     const load = (name, cb) => mtlLoader.load(name + ".mtl", materials => {
       materials.preload();
       objLoader.setMaterials(materials);
-      objLoader.load(name + ".obj", mesh => cb(mesh));
+      objLoader.load(name + ".obj", mesh => {
+        cb(mesh);
+      });
     });
 
     load("chess", mesh => {
       //mesh.position.set(-8, -2, -8);
       //mesh.scale.set(4, 4, 4);
+      mesh.traverse(child => {
+        if (child instanceof THREE.Mesh) {
+          child.geometry.computeBoundingBox();
+        }
+      });
       this.add(mesh);
+
     });
 
-    const blerbGeom = geom.blerb;
-    this.h = 1.4;//blerbGeom.parameters.height - 0.4;
-    this.w = 0.7;//blerbGeom.parameters.width;
-    //const b1 = new THREE.Mesh(blerbGeom, materials.blerbBody);
-    //b1.scale.set(1, 0.3, 1);
-    //b1.position.y = 0.4;
-    //this.add(b1);
+    this.name = "blerb";
+    this.userData.entity = this;
 
-    // Some hair
-    //const b2 = new THREE.Mesh(blerbGeom, materials.white);
-    //this.add(b2);
-    //b2.position.y += 0.6;
-    //b2.scale.set(0.9, 0.1, 0.9);
-
-    // A blerbBody
-    //const b3 = new THREE.Mesh(blerbGeom, materials.blerbBody);
-    //this.add(b3);
-    //b3.position.y += 0.2;
-    //b3.scale.set(0.7, 0.8, 0.7);
+    //const blerbGeom = geom.blerb;
+    this.h = 1.4; //blerbGeom.parameters.height - 0.4;
+    this.w = 0.7; //blerbGeom.parameters.width;
 
     this.canFall = true;
 
@@ -80,12 +74,12 @@ class Blerb extends THREE.Object3D {
 
     switch (state) {
     case "walking":
-      if (Math.random() < 0.01) {
+      /*if (Math.random() < 0.01) {
         this.setState(Math.random() < 0.2 ? "stacking" : "building");
       }
       if (Math.random() < 0.002) {
         this.setState("bashing");
-      }
+      }*/
       break;
     case "building":
       if (tx !== lastTx || tz !== lastTz || this.stateTime > 1000) {
@@ -97,9 +91,9 @@ class Blerb extends THREE.Object3D {
           this.setState("walking");
         }
       }
-      if (Math.random() < 0.01) {
-        this.setState("walking");
-      }
+      // if (Math.random() < 0.01) {
+      //   this.setState("walking");
+      // }
       break;
     case "stacking":
       if (this.stateTime > 5) {

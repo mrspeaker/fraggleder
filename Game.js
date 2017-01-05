@@ -4,6 +4,7 @@ const World = require("./world/World");
 const Physics = require("./Physics");
 const OBJLoader = require("./vendor/OBJLoader");
 const MTLLoader = require("./vendor/MTLLoader");
+const MouseInput = require("./MouseInput");
 
 const tween = require("./TweenManager");
 
@@ -12,6 +13,9 @@ class Game {
   constructor () {
     this.dist = 35;
     this.rechunkIdx = 0;
+
+    this.mouse = new MouseInput();
+    this.raycaster = new THREE.Raycaster();
 
     this.scene = null;
     this.geom = {};
@@ -117,8 +121,26 @@ class Game {
   }
 
   update () {
-    const {camera, scene, renderer, world} = this;
+    const {camera, mouse, raycaster, scene, renderer, world} = this;
     const spd = Date.now() / 10000;
+
+    if (mouse.pressed) {
+      raycaster.setFromCamera(mouse.pos, camera);
+      const intersects = raycaster.intersectObjects(scene.children, true);
+      if (intersects.length) {
+        const o = intersects[0].object;
+        if (o && o.parent && o.parent.parent) {
+          const blerb = o.parent.parent;
+          if (blerb.state === "walking") {
+            blerb.setState(Math.random() < 0.2 ? "stacking" : "building");
+          } else {
+            blerb.setState("walking");
+          }
+
+        }
+      }
+    }
+
 
     for (let c in world.chunks) {
       const chunk = world.chunks[c];
@@ -137,6 +159,7 @@ class Game {
     camera.lookAt(new THREE.Vector3(8, 12, 8));
 
     tween.update();
+    mouse.update();
 
     requestAnimationFrame(this.update);
   }
