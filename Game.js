@@ -5,7 +5,7 @@ const Physics = require("./Physics");
 const OBJLoader = require("./vendor/OBJLoader");
 const MTLLoader = require("./vendor/MTLLoader");
 const MouseInput = require("./MouseInput");
-
+const Backpack = require("./Backpack");
 const tween = require("./TweenManager");
 
 class Game {
@@ -16,6 +16,7 @@ class Game {
 
     this.mouse = new MouseInput();
     this.raycaster = new THREE.Raycaster();
+    this.backpack = new Backpack();
 
     this.scene = null;
     this.geom = {};
@@ -103,7 +104,6 @@ class Game {
     const {scene} = this;
     this.geom[ch] = makeChunkGeom(this.world.chunks[ch]);
     scene.add(this.geom[ch]);
-    this.world.entities[ch].forEach(en => this.scene.add(en));
   }
 
   rechunk (ch) {
@@ -124,30 +124,55 @@ class Game {
     const {camera, mouse, raycaster, scene, renderer, world} = this;
     const spd = Date.now() / 10000;
 
-    if (mouse.pressed) {
-      raycaster.setFromCamera(mouse.pos, camera);
-      const intersects = raycaster.intersectObjects(scene.children, true);
-      if (intersects.length) {
-        const o = intersects[0].object;
-        if (o && o.parent && o.parent.parent) {
-          const blerb = o.parent.parent;
-          if (blerb.state === "walking") {
-            blerb.setState(Math.random() < 0.2 ? "stacking" : "building");
-          } else {
-            blerb.setState("walking");
-          }
+    if (world.newEntities.length) {
+      world.newEntities.forEach(e => {
+        world.entities.push(e);
+        scene.add(e);
+      });
+      world.newEntities = [];
+    }
 
+    if (mouse.pressed) {
+      if (mouse.pos.x < 100) {
+        if (mouse.pos.y < 50) {
+          this.backpack.setItem(0);
+        }
+        else {
+          this.backpack.setItem(1);
+        }
+      }
+      else {
+        raycaster.setFromCamera({
+          x: (mouse.pos.x / window.innerWidth) * 2 - 1,
+          y: - (mouse.pos.y / window.innerHeight) * 2 + 1
+        }, camera);
+        const intersects = raycaster.intersectObjects(scene.children, true);
+        if (intersects.length) {
+          const o = intersects[0].object;
+          if (o && o.parent && o.parent.parent) {
+            const blerb = o.parent.parent;
+            if (blerb.state === "walking") {
+              //blerb.setState(Math.random() < 0.2 ? "stacking" : "building");
+              blerb.setState(["stacking", "building"][this.backpack.current]);
+            } else {
+              blerb.setState("walking");
+            }
+          }
         }
       }
     }
 
-
-    for (let c in world.chunks) {
+    /*
+      for (let c in world.chunks) {
       const chunk = world.chunks[c];
       const ents = world.entities[c];
-      this.physics.update(chunk, ents);
+      this.physics.update(chunk, ents, world.chunks);
       ents.forEach(e => e.update(chunk));
-    }
+    }*/
+    world.entities.forEach(e => {
+      const chunk = this.physics.update(e, world.chunks, world.cw, world.ch);
+      e.update(chunk);
+    });
 
     this.rechunk(world.chunkArr[this.rechunkIdx++ % world.size]);
 

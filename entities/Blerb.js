@@ -1,8 +1,7 @@
 const THREE = require("three");
+const tween = require("../TweenManager");
 const OBJLoader = require("../vendor/OBJLoader");
 const MTLLoader = require("../vendor/MTLLoader");
-
-const tween = require("../TweenManager");
 
 class Blerb extends THREE.Object3D {
   constructor(x, y, z, cw, ch) {
@@ -67,10 +66,9 @@ class Blerb extends THREE.Object3D {
     let {state, stateTime, tx, ty, tz, lastTx, lastTy, lastTz} = this;
     const isStateFirst = stateTime === 0;
     stateTime = this.stateTime++;
-
-    if (Math.random() < 0.01) {
-      this.canFall = !this.canFall;
-    }
+    // if (Math.random() < 0.01) {
+    //     this.canFall = !this.canFall;
+    // }
 
     switch (state) {
     case "walking":

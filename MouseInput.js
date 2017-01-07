@@ -30,13 +30,13 @@ class MouseInput {
   down ({clientX: x, clientY: y}) {
     this.isDown = false;
     this.pressed = true;
-    this.pos.x = (x / window.innerWidth) * 2 - 1;
-    this.pos.y = - (y / window.innerHeight) * 2 + 1;
+    this.pos.x = x;//(x / window.innerWidth) * 2 - 1;
+    this.pos.y = y;//- (y / window.innerHeight) * 2 + 1;
   }
 
   move ({clientX: x, clientY: y}) {
-    this.pos.x = (x / window.innerWidth) * 2 - 1;
-    this.pos.y = - (y / window.innerHeight) * 2 + 1;
+    this.pos.x = x;//(x / window.innerWidth) * 2 - 1;
+    this.pos.y = y;//- (y / window.innerHeight) * 2 + 1;
   }
 
   up () {

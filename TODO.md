@@ -1,9 +1,4 @@
-# Add job by clicking
-
-* Add event listener for Mouse
-* Get mesh clicked
-* Join mesh to Blerb
-* Set blerb task.
+# Face direction walking
 
 # Add animation to character
 

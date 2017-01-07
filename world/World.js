@@ -7,7 +7,10 @@ class World {
     this.ch = 32;
 
     this.chunks = {};
-    this.entities = {};
+
+    this.newEntities = [];
+    this.toRemoveEntities = [];
+    this.entities = [];
 
     this.addChunk(0, 0, 0);
     this.addChunk(1, 0, 0);
@@ -27,7 +30,7 @@ class World {
     const {cw, ch} = this;
     const id = x + "_" + y + "_" + z;
     this.chunks[id] = new Chunk(cw, ch, x, y, z);
-    this.entities[id] = Array.from(new Array(6)).map(() => {
+    const ents = Array.from(new Array(6)).map(() => {
       return new Blerb(
         cw / 2 | 0 + (x * cw),
         1,
@@ -35,6 +38,7 @@ class World {
         cw,
         ch);
     });
+    this.newEntities.push(...ents);
   }
 
 }
